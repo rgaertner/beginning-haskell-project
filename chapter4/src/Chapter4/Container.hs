@@ -4,8 +4,12 @@ module Chapter4.Container where
 
 import Chapter2.SimpleFunctions (Client(..),Person(..),Gender(..),TimeMachineR(..) )
 import Chapter3.MoreModules (listOfClients,compareClient,companyAnalytics,companyDutiesAnalytics)
+import Data.Function (on)
 import qualified Data.Map as M
 import qualified Data.Set as S
+import qualified Data.Data as D
+import qualified Data.List as L
+
 
 insert' :: Ord k => k -> a -> M.Map k a -> M.Map k a 
 insert' k v m = M.alter (\Nothing -> Just(v)) k m 
@@ -23,9 +27,14 @@ data ClientKind = GovOrgKind | CompanyKind | IndividualKind
 classifyClients :: [Client Integer] -> M.Map ClientKind (S.Set(Client Integer))
 classifyClients [] = M.fromList [(GovOrgKind,S.empty),(CompanyKind,S.empty),(IndividualKind,S.empty)]
 classifyClients (c:cs) = M.adjust (S.insert(c)) (getKind c) $ classifyClients cs 
-                     where getKind (Company {}) = CompanyKind
-                           getKind (GovOrg {}) = GovOrgKind
-                           getKind (Individual {}) = IndividualKind
+
+getKind :: Client a -> ClientKind
+getKind (Company {}) = CompanyKind
+getKind (GovOrg {}) = GovOrgKind
+getKind (Individual {}) = IndividualKind
+
+classifyClients' :: [Client Integer] -> M.Map ClientKind (S.Set(Client Integer))
+classifyClients' = M.fromList . map (\c -> (getKind $ head c, S.fromList(c))) . L.groupBy ((==) `on` D.toConstr) . L.sort
 
 class Nameable n where
   naming :: n -> String

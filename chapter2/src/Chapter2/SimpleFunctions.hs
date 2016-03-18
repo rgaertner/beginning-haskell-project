@@ -1,7 +1,10 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE UnicodeSyntax #-}
+{-# LANGUAGE DeriveDataTypeable #-}
 module Chapter2.SimpleFunctions ( Client(..),Person(..),Gender(..),TimeMachineR(..) ) where
+
+import Data.Data 
 
 firstOrEmpty ∷ [String] -> String
 firstOrEmpty lst = if not (null lst) then head lst else "empty"
@@ -37,28 +40,15 @@ maxmin2 (x:xs) = (if x > xs_max then x else xs_max,
                 where (xs_max,xs_min) = maxmin2 xs
 
 data Gender = Male | Female | Unknown
-              deriving (Show,Read,Eq,Ord) 
+              deriving (Show,Read,Eq,Ord,Typeable,Data) 
 
 data Client i = GovOrg  { clientId :: i , clientName :: String }
               | Company { clientId :: i , clientName :: String , person :: Person, duty :: String }
               | Individual { clientId :: i , person :: Person }
-              deriving (Show,Read,Eq,Ord) 
+              deriving (Show,Read,Eq,Ord,Typeable,Data) 
 
 data Person = Person { firstName :: String, lastName :: String, gender :: Gender }
-              deriving (Show,Read,Eq,Ord) 
-
-{-data Client = GovOrg String -}
-            {-| Company String Integer Person String-}
-            {-| Individual Person Bool-}
-            {-deriving Show-}
-
-{-data ClientR = GovOrgR {clientRName :: String}-}
-             {-| CompanyR {clientRName :: String, companyId :: Integer, person :: PersonR, duty :: String}-}
-             {-| IndividualR {person :: PersonR}-}
-             {-deriving Show-}
-
-{-data PersonR = PersonR {firstName :: String, lastName :: String}-}
-            {-deriving (Show, Read)-}
+              deriving (Show,Read,Eq,Ord,Typeable,Data) 
 
 getClientName :: Client a -> String 
 getClientName client = case client of
